@@ -10,8 +10,10 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    //Place your instance variables here
-    
+    let allQuestions = QuestionBank()
+    var pickedAnswer : Bool = false
+    var questionNumber : Int = 0
+    var score : Int = 0
     
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
@@ -21,31 +23,67 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        nextQuestion()
     }
 
 
     @IBAction func answerPressed(_ sender: AnyObject) {
-  
+        if (sender.tag == 1) {
+            pickedAnswer = true
+        } else {
+            pickedAnswer = false
+        }
+        
+        checkAnswer()
+        
+        questionNumber += 1
+        
+        nextQuestion()
     }
     
     
     func updateUI() {
-      
+        scoreLabel.text = "Score: \(score)"
+        progressLabel.text = "\(questionNumber + 1) / 13"
+        progressBar.frame.size.width = (view.frame.width / CGFloat(allQuestions.list.count)) * CGFloat(questionNumber + 1)
     }
     
 
     func nextQuestion() {
-        
+        if (questionNumber == allQuestions.list.count - 1) {
+            let alert = UIAlertController(title: "Awesome", message: "You've finished all questions!", preferredStyle: .alert)
+            
+            let restartAction = UIAlertAction(title: "Restart", style: .default, handler: { (UIAlertAction) in
+                self.startOver()
+            })
+            
+            alert.addAction(restartAction)
+            present(alert, animated: true, completion: nil)
+            
+        } else {
+            questionLabel.text = allQuestions.list[questionNumber].questionText
+        }
+        updateUI()
     }
     
     
     func checkAnswer() {
+        let correctAnswer = allQuestions.list[questionNumber].answer
         
+        if (correctAnswer == pickedAnswer) {
+            print("You got it!")
+            score += 1
+        } else {
+            print("You are wrong.")
+        }
     }
     
     
     func startOver() {
-       
+        questionNumber = 0
+        score = 0
+        progressBar.frame.size.width = 10
+        nextQuestion()
     }
     
 
